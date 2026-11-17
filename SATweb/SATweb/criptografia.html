@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criptografía y firma digital | Seguridad Informática</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html">Inicio</a>
+    <a href="informacion.html">Información</a>
+    <a href="amenazas.html">Amenazas</a>
+    <a href="proteccion.html">Protección</a>
+    <a href="acceso.html">Acceso</a>
+    <a href="criptografia.html" class="activo">Criptografía</a>
+    <a href="noticias.html">Noticias</a>
+</nav>
+
+<header class="hero">
+    <h1>Criptografía y firma digital</h1>
+    <p>Cifrado simétrico y asimétrico, funciones hash, firma digital, certificados y PKI.</p>
+</header>
+
+<main class="contenedor">
+
+    <section class="tarjeta">
+        <h2>¿Por qué cifrar?</h2>
+        <p>
+            La información es poder: los planos de un motor eléctrico o la fórmula de un
+            medicamento interesan a terceros, como la competencia. Para sacarle partido hay
+            que compartirla, y en el canal pueden estar acechando personas que intenten interceptarla.
+        </p>
+        <p>
+            El objetivo del cifrado es que, aunque alguien capture el mensaje, <strong>no entienda nada</strong>
+            porque el contenido está cifrado.
+        </p>
+        <div class="indice">
+            <a class="boton" href="#simetrica">Simétrica</a>
+            <a class="boton" href="#asimetrica">Asimétrica</a>
+            <a class="boton" href="#hibrida">Híbrida</a>
+            <a class="boton" href="#hash">Hash</a>
+            <a class="boton" href="#firma">Firma digital</a>
+            <a class="boton" href="#pki">PKI</a>
+        </div>
+    </section>
+
+    <section class="tarjeta">
+        <h2>Criptografía</h2>
+        <p>
+            La palabra viene del griego <em>cripto</em> («ocultar») y <em>graphos</em> («escribir»):
+            cómo escribir mensajes ocultos. Consiste en aplicar un <strong>algoritmo</strong> al documento
+            original para obtener un documento cifrado ilegible.
+        </p>
+        <p>
+            El algoritmo puede ser conocido por el enemigo, así que la privacidad la aporta
+            la <strong>clave</strong>. Para protegerla de la fuerza bruta conviene:
+        </p>
+        <ul>
+            <li>Usar claves de gran longitud (por ejemplo 2048 o 4096 bits en asimétrica).</li>
+            <li>Cambiar las claves regularmente.</li>
+            <li>Usar todos los tipos de caracteres (solo números = 10 valores por posición; letras y números = 36).</li>
+            <li>Evitar palabras identificables y detectar intentos fallidos repetidos.</li>
+        </ul>
+        <p>
+            También pueden existir fallos en el propio algoritmo o en su implementación;
+            los estudia el <strong>criptoanálisis</strong>.
+        </p>
+    </section>
+
+    <h2 id="simetrica">Criptografía simétrica</h2>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Una sola clave</span>
+        <h3>Características</h3>
+        <ul>
+            <li>Usa la <strong>misma clave</strong> para cifrar y descifrar.</li>
+            <li>Es sencilla y eficiente: cifra y descifra rápido.</li>
+            <li>Algoritmos habituales: DES, 3DES, <strong>AES</strong>, Blowfish e IDEA (DES y 3DES se consideran hoy obsoletos).</li>
+        </ul>
+        <p>
+            <strong>Funcionamiento:</strong> el receptor aplica el mismo algoritmo con la misma clave en modo
+            descifrar. Si el documento no se ha alterado y la clave es la misma, obtiene el original.
+        </p>
+
+        <h3>Ejemplo: autenticación de un móvil GSM</h3>
+        <ol>
+            <li>La SIM contiene un identificador <strong>T</strong> y una clave <strong>K</strong>, que la operadora también tiene asociados a nuestro contrato.</li>
+            <li>Al encender el teléfono, solicita entrar con T y el servidor envía un número aleatorio <strong>A</strong> (desafío).</li>
+            <li>El teléfono aplica un algoritmo simétrico a A con la clave K y devuelve el resultado <strong>B</strong>.</li>
+            <li>El servidor hace lo mismo; si el resultado coincide con B, confirma que somos los dueños de T y asigna el número.</li>
+        </ol>
+        <p>Si cambiamos de teléfono no importa: el número va asociado a la SIM.</p>
+
+        <h3>Problemas</h3>
+        <ul>
+            <li><strong>Circulación de la clave:</strong> no se puede enviar por el mismo canal inseguro que el mensaje; hace falta un segundo canal seguro.</li>
+            <li><strong>Gestión de claves:</strong> si diez trabajadores se comunican en privado entre todos, cada uno necesita nueve claves distintas y nueve canales seguros para renovarlas.</li>
+        </ul>
+    </section>
+
+    <h2 id="asimetrica">Criptografía asimétrica</h2>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Clave pública + clave privada</span>
+        <h3>Características</h3>
+        <ul>
+            <li>Usa <strong>dos claves relacionadas matemáticamente</strong>: lo que se cifra con una solo se descifra con la otra.</li>
+            <li>El receptor genera el par y comunica su <strong>clave pública</strong> sin necesidad de canal protegido.</li>
+            <li>La <strong>clave privada</strong> nunca se comunica y es "imposible" deducirla a partir de la pública.</li>
+        </ul>
+        <p>
+            Resuelve los problemas de la simétrica: no hace falta un canal seguro para distribuir claves y
+            cada persona solo necesita su propio par (nueve empleados, nueve pares de claves).
+        </p>
+
+        <h3>Problemas</h3>
+        <ul>
+            <li>Es <strong>poco eficiente</strong>: tarda bastante en aplicar las claves.</li>
+            <li>Usar la clave privada repetidamente es arriesgado, porque algunos ataques analizan paquetes cifrados.</li>
+            <li>Hay que <strong>proteger y transportar</strong> la clave privada. Se guardan en un fichero llamado <em>keyring</em> (llavero), protegido con cifrado simétrico y con copia de seguridad. La solución más común es la tarjeta inteligente.</li>
+        </ul>
+    </section>
+
+    <section class="tarjeta">
+        <h3>Simétrica frente a asimétrica</h3>
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Característica</th><th>Simétrica</th><th>Asimétrica</th></tr>
+            <tr><td>Claves</td><td>Una, compartida</td><td>Par: pública y privada</td></tr>
+            <tr><td>Velocidad</td><td>Rápida</td><td>Lenta</td></tr>
+            <tr><td>Distribución de claves</td><td>Necesita canal seguro</td><td>La pública puede difundirse libremente</td></tr>
+            <tr><td>Ejemplos</td><td>AES, 3DES, Blowfish</td><td>RSA</td></tr>
+        </table>
+        </div>
+    </section>
+
+    <h2 id="hibrida">Criptografía híbrida</h2>
+
+    <section class="tarjeta">
+        <p>
+            El cifrado asimétrico es demasiado lento para cifrar todo el tráfico, así que se combinan ambos:
+        </p>
+        <ul>
+            <li><strong>Asimétrica</strong> solo al inicio de la sesión, para crear un canal seguro donde acordar una clave simétrica aleatoria.</li>
+            <li><strong>Simétrica</strong> durante la transmisión, con esa clave, que suele renovarse cada pocos minutos.</li>
+        </ul>
+
+        <h3>Ejemplos de sistemas híbridos</h3>
+        <ul>
+            <li><strong>SSH:</strong> acceso y administración remota segura, sustituye a Telnet; permite SFTP y túneles seguros.</li>
+            <li><strong>PGP / GPG (GnuPG):</strong> cifran el mensaje con una clave simétrica y esta con la clave pública del destinatario, todo en un solo paquete. GPG es software libre, usa el estándar OpenPGP y también cifra archivos y añade firmas digitales.</li>
+        </ul>
+<pre><code>gpg --full-generate-key                      # crear el par de claves
+gpg --encrypt --recipient ana@correo.es doc.txt   # cifrar para Ana
+gpg --decrypt doc.txt.gpg                    # descifrar con nuestra privada
+gpg --sign doc.txt                           # firmar</code></pre>
+    </section>
+
+    <h2 id="hash">Funciones hash</h2>
+
+    <section class="tarjeta">
+        <p>
+            Un <strong>hash</strong> (resumen) transforma cualquier dato en una cadena de longitud fija
+            mediante una función matemática. Actúa como una "huella digital" del contenido: si dos archivos
+            tienen el mismo hash se consideran idénticos, y si el archivo cambia, el hash cambia.
+        </p>
+        <h3>Comprobar la integridad con md5sum</h3>
+<pre><code>md5sum Documento1.txt                       # obtener el hash
+md5sum Documento1.txt Documento2.txt        # comparar dos archivos
+md5sum Documento1.txt > Documento1.md5      # guardar el hash
+md5sum -c Documento1.md5                    # verificar más tarde</code></pre>
+        <p>
+            Si el archivo no se ha modificado, la salida es <code>Documento1.txt: OK</code>; si se ha alterado,
+            <code>Documento1.txt: FAILED</code>. Los fabricantes publican el hash junto a sus instaladores para
+            que podamos verificar que la descarga no está manipulada.
+        </p>
+
+        <h3>Funciones hash inseguras</h3>
+        <p>
+            Una <strong>colisión</strong> ocurre cuando dos archivos distintos producen el mismo hash.
+            Se demostraron colisiones en <strong>MD5</strong> (2004) y en <strong>SHA-1</strong> (2016), por lo que
+            ya no se consideran seguras para uso criptográfico.
+        </p>
+        <p>
+            Hoy se usa la familia <strong>SHA-2</strong> (SHA-224, SHA-256, SHA-384, SHA-512); lo habitual es SHA-256.
+        </p>
+<pre><code>echo -n "Hello" | openssl dgst -sha256
+sha256sum fichero.iso</code></pre>
+    </section>
+
+    <h2 id="firma">Cifrar y firmar</h2>
+
+    <section class="tarjeta">
+        <div class="aviso-caja">
+            <strong>No es lo mismo:</strong> <em>cifrar</em> oculta el contenido para que solo lo lea el destinatario
+            (confidencialidad); <em>firmar</em> garantiza la identidad del autor y que el documento no se ha modificado
+            (autenticidad, integridad y no repudio).
+        </div>
+
+        <h3>Mecanismo de firma digital</h3>
+        <ol>
+            <li>El emisor aplica una función hash al documento y obtiene el <strong>resumen</strong>.</li>
+            <li>Cifra ese resumen con su <strong>clave privada</strong> y lo envía junto al documento original.</li>
+            <li>El receptor calcula el hash del documento recibido y descifra el resumen con la <strong>clave pública</strong> del emisor.</li>
+            <li>Si ambos resúmenes coinciden, el documento proviene del dueño de la clave pública y no ha sido alterado.</li>
+        </ol>
+
+        <h3>Firmar y cifrar a la vez</h3>
+        <ol>
+            <li>El emisor genera el resumen y lo firma con su clave privada.</li>
+            <li>Cifra el documento y la firma con la <strong>clave pública del receptor</strong>.</li>
+            <li>El receptor descifra con su <strong>clave privada</strong> y comprueba la firma con la <strong>clave pública del emisor</strong>.</li>
+        </ol>
+
+        <h3>Autenticación sin contraseña (desafío)</h3>
+        <p>
+            El servidor guarda la clave pública del cliente. Al iniciar sesión genera un <strong>desafío</strong> aleatorio,
+            lo cifra con esa clave pública y lo envía. El cliente lo descifra con su clave privada y devuelve el resultado;
+            si coincide con el desafío original, el cliente es de confianza. Es el funcionamiento de las claves SSH.
+        </p>
+    </section>
+
+    <h2 id="pki">PKI y certificados digitales</h2>
+
+    <section class="tarjeta">
+        <h3>¿Qué problema resuelven?</h3>
+        <p>
+            Para cifrar y firmar necesitamos estar seguros de que una clave pública pertenece realmente a quien dice.
+            Entre compañeros es fácil de comprobar; en Internet, no. Ahí intervienen los certificados y la PKI.
+        </p>
+        <ul>
+            <li><strong>Certificado digital:</strong> documento electrónico, firmado por una Autoridad de Certificación (CA), que vincula una identidad con una clave pública. Es como un DNI digital.</li>
+            <li><strong>PKI (Public Key Infrastructure):</strong> toda la infraestructura que emite, verifica, gestiona y revoca esos certificados. Sería la administración que expide los DNI.</li>
+        </ul>
+
+        <h3>Entes de la PKI</h3>
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Ente</th><th>Función</th><th>Ejemplos</th></tr>
+            <tr><td><strong>CA</strong> (Autoridad de Certificación)</td><td>Emite y firma los certificados.</td><td>FNMT, Izenpe, DigiCert, GlobalSign</td></tr>
+            <tr><td><strong>RA</strong> (Autoridad de Registro)</td><td>Verifica la identidad del solicitante antes de emitir.</td><td>Oficinas de Hacienda, ayuntamientos</td></tr>
+            <tr><td><strong>VA</strong> (Autoridad de Validación)</td><td>Comprueba que un certificado es válido (no revocado ni caducado).</td><td>A veces la propia CA</td></tr>
+            <tr><td><strong>Repositorios</strong></td><td>Almacenan certificados y listas de revocación.</td><td></td></tr>
+        </table>
+        </div>
+
+        <h3>¿Qué contiene un certificado? (estándar X.509)</h3>
+        <ul>
+            <li><strong>Titular (Subject):</strong> persona, empresa o servidor.</li>
+            <li><strong>Clave pública</strong> del titular.</li>
+            <li><strong>Emisor (Issuer):</strong> la CA que lo firma.</li>
+            <li><strong>Periodo de validez:</strong> fechas de inicio y caducidad.</li>
+            <li><strong>Número de serie</strong> único.</li>
+            <li><strong>Firma digital de la CA</strong>, que garantiza que no ha sido modificado.</li>
+            <li><strong>Usos permitidos</strong> (Key Usage): autenticación de servidores, firma digital, etc.</li>
+        </ul>
+
+        <h3>Autenticación con certificados</h3>
+        <ol>
+            <li>El servidor envía su certificado al cliente.</li>
+            <li>El cliente comprueba que es válido, que lo firmó una CA de confianza y que no ha caducado ni se ha revocado.</li>
+            <li>Si todo es correcto, se establece la comunicación segura (HTTPS, SSH...).</li>
+        </ol>
+    </section>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Práctica</span>
+        <h3>Ver el almacén de certificados y un certificado HTTPS</h3>
+        <ol>
+            <li>En Windows, pulsa <code>Win + R</code>, escribe <code>certmgr.msc</code> e Intro.</li>
+            <li>Abre «Entidades de certificación raíz de confianza» → «Certificados» para ver las CA raíz instaladas.</li>
+            <li>Mira «Personal» → «Certificados» para ver si hay certificados personales.</li>
+            <li>En el navegador, entra en una web HTTPS y pulsa el candado 🔒 para ver el certificado: titular, emisor y validez.</li>
+        </ol>
+    </section>
+
+    <section class="tarjeta">
+        <h3>Certificado personal: FNMT y DNIe</h3>
+        <p>
+            Para obtener un certificado personal de la FNMT: solicitarlo, verificar la identidad en una oficina de registro,
+            descargarlo y hacer una copia de seguridad. Sirve para identificarse ante la Administración, firmar y cifrar
+            documentos, y las acciones realizadas tienen valor jurídico.
+        </p>
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>DNI electrónico</th><th>Certificado FNMT de persona física</th></tr>
+            <tr><td>Los certificados están en el chip de la tarjeta.</td><td>Se instala en el ordenador.</td></tr>
+            <tr><td>Normalmente requiere lector y PIN.</td><td>Normalmente no necesita lector.</td></tr>
+            <tr><td>La clave privada nunca sale del chip.</td><td>La clave privada puede ser exportable.</td></tr>
+            <tr><td colspan="2">Ambos permiten autenticación y firma electrónica.</td></tr>
+        </table>
+        </div>
+        <p>
+            El DNIe no es un certificado en sí, sino una tarjeta inteligente que los contiene junto con sus claves.
+        </p>
+        <p>
+            Más información:
+            <a href="https://www.sede.fnmt.gob.es/" target="_blank" rel="noopener noreferrer">FNMT</a> ·
+            <a href="https://www.dnielectronico.es/" target="_blank" rel="noopener noreferrer">DNI electrónico</a>
+        </p>
+    </section>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Riesgos</span>
+        <h3>Vulnerabilidades de la PKI</h3>
+        <ul>
+            <li><strong>Malware</strong> que modifica el almacén de certificados e instala una CA falsa como de confianza.</li>
+            <li><strong>Hackeo de una CA:</strong> el atacante puede emitir certificados falsos que el navegador considerará fiables, comprometiendo HTTPS y engañando a los usuarios (por ejemplo, con una web falsa de su banco).</li>
+        </ul>
+    </section>
+
+    <section class="tarjeta">
+        <h3>SSH frente a SSL/TLS</h3>
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Característica</th><th>SSH</th><th>SSL/TLS</th></tr>
+            <tr><td>Objetivo</td><td>Acceso remoto seguro</td><td>Comunicación web segura</td></tr>
+            <tr><td>Uso típico</td><td>Administrar servidores</td><td>Proteger páginas web (HTTPS), correo</td></tr>
+            <tr><td>Certificados</td><td>Opcional, suele usar pares de claves</td><td>Requiere certificado digital (PKI)</td></tr>
+            <tr><td>Cifrado</td><td>Sí, extremo a extremo entre cliente y servidor</td><td>Sí, entre navegador y servidor</td></tr>
+        </table>
+        </div>
+        <p>
+            <strong>Ejemplo:</strong> el administrador de <code>www.midominio.com</code> se conecta por
+            <code>ssh usuario@www.midominio.com</code>, mientras que los clientes acceden a la web por HTTPS gracias
+            a un certificado SSL/TLS instalado en el servidor.
+        </p>
+    </section>
+
+    <section class="tarjeta">
+        <h2>Resumen de conceptos</h2>
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Concepto</th><th>Idea clave</th></tr>
+            <tr><td>Cifrado simétrico</td><td>Una clave; rápido; problema: compartirla.</td></tr>
+            <tr><td>Cifrado asimétrico</td><td>Clave pública y privada; lento; sin canal seguro.</td></tr>
+            <tr><td>Cifrado híbrido</td><td>Asimétrico para acordar la clave y simétrico para los datos.</td></tr>
+            <tr><td>Hash</td><td>Huella digital; verifica integridad. Evitar MD5 y SHA-1.</td></tr>
+            <tr><td>Firma digital</td><td>Hash cifrado con la clave privada: autoría e integridad.</td></tr>
+            <tr><td>Certificado digital</td><td>Vincula una identidad con una clave pública (X.509).</td></tr>
+            <tr><td>PKI</td><td>CA, RA, VA y repositorios que gestionan los certificados.</td></tr>
+        </table>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>Seguridad Informática · SAD · 2AS3A</p>
+</footer>
+
+</body>
+</html>

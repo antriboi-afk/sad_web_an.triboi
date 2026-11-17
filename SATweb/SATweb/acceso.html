@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de acceso | Seguridad Informática</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html">Inicio</a>
+    <a href="informacion.html">Información</a>
+    <a href="amenazas.html">Amenazas</a>
+    <a href="proteccion.html">Protección</a>
+    <a href="acceso.html" class="activo">Acceso</a>
+    <a href="criptografia.html">Criptografía</a>
+    <a href="noticias.html">Noticias</a>
+</nav>
+
+<header class="hero">
+    <h1>Control de acceso y contraseñas</h1>
+    <p>Seguridad lógica: permisos, listas de control de acceso (ACL) y políticas de contraseñas.</p>
+</header>
+
+<main class="contenedor">
+
+    <section class="tarjeta">
+        <h2>¿Qué es la seguridad lógica?</h2>
+        <p>
+            La seguridad lógica agrupa las barreras y procedimientos que
+            protegen los datos y el software que los procesa, controlando
+            quién puede acceder a ellos, tanto si están almacenados como
+            si se están transmitiendo.
+        </p>
+        <p>
+            Su principio básico es: <strong>todo lo que no esté permitido
+            debe estar prohibido</strong>. El control de acceso se apoya en dos procesos:
+            la <strong>identificación</strong> (el usuario se da a conocer) y la
+            <strong>autenticación</strong> (el sistema verifica esa identidad).
+        </p>
+        <div class="indice">
+            <a class="boton" href="#permisos">Permisos en Linux</a>
+            <a class="boton" href="#acl">ACL</a>
+            <a class="boton" href="#contrasenas">Contraseñas</a>
+        </div>
+    </section>
+
+    <h2 id="permisos">Permisos tradicionales en GNU/Linux</h2>
+
+    <section class="tarjeta">
+        <h3>Usuarios, grupos y permisos</h3>
+        <p>
+            En Linux cada archivo pertenece a un <strong>usuario propietario</strong>
+            y a un <strong>grupo propietario</strong>. Los permisos se asignan a tres
+            categorías: usuario (u), grupo (g) y otros (o), y pueden ser
+            lectura (<code>r</code>), escritura (<code>w</code>) y ejecución (<code>x</code>).
+        </p>
+        <pre><code>$ ls -l
+-rw-rw-r-- 1 profesor profesor 171 oct 3 2016 Makefile
+-rw-r----- 1 conta01  conta01   58 sep 30 2016 README</code></pre>
+        <p>
+            El primer carácter indica el tipo (<code>-</code> archivo, <code>d</code> directorio,
+            <code>l</code> enlace simbólico) y los nueve siguientes son los permisos de u, g y o.
+        </p>
+
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Comando</th><th>Función</th></tr>
+            <tr><td><code>chmod 640 fichero</code></td><td>Asigna permisos en octal (equivale a <code>u=rw,g=r,o=</code>).</td></tr>
+            <tr><td><code>chmod g+w fichero</code></td><td>Añade o quita permisos con notación simbólica.</td></tr>
+            <tr><td><code>chgrp grupo fichero</code></td><td>Cambia el grupo propietario.</td></tr>
+            <tr><td><code>chown usuario:grupo fichero</code></td><td>Cambia el propietario (solo root).</td></tr>
+        </table>
+        </div>
+    </section>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Limitación</span>
+        <h3>Cuando usuario-grupo-otros no basta</h3>
+        <p>
+            Imagina que <code>conta01.txt</code> debe ser de lectura y escritura para
+            <code>conta02</code> e <code>info01</code>, y solo de lectura para <code>info02</code>.
+            Con permisos clásicos habría que crear un grupo nuevo, añadir usuarios,
+            cambiar el grupo del archivo y, para <code>info02</code>, dar lectura a
+            "otros" (<code>chmod o+r</code>).
+        </p>
+        <div class="aviso-caja">
+            <strong>Agujero de seguridad:</strong> dar lectura a "otros" permite leer el archivo
+            a <em>todos</em> los usuarios del sistema, no solo a <code>info02</code>.
+            El sistema clásico no tiene suficiente granularidad.
+        </div>
+    </section>
+
+    <h2 id="acl">Listas de control de acceso (ACL)</h2>
+
+    <section class="tarjeta">
+        <h3>¿Qué son?</h3>
+        <p>
+            Las ACL amplían el sistema tradicional y permiten asignar permisos a
+            <strong>usuarios o grupos concretos</strong>. Cada entrada indica un sujeto
+            (usuario o grupo) y las operaciones que se le permiten.
+        </p>
+        <p>
+            <strong>Ejemplo:</strong> un fichero con la ACL (David: leer y escribir; Ángela: leer)
+            permite a David modificarlo, mientras que Ángela solo puede consultarlo.
+        </p>
+        <p>
+            <strong>Buena práctica:</strong> usar los permisos tradicionales siempre que
+            sean suficientes y recurrir a las ACL cuando se necesiten permisos más específicos.
+        </p>
+
+        <h3>Requisitos</h3>
+        <p>
+            El sistema de archivos debe tener las ACL habilitadas (ext4 y Btrfs
+            las traen activadas por defecto) y el paquete <code>acl</code> instalado.
+        </p>
+<pre><code>dpkg -s acl                 # comprobar si está instalado
+sudo apt-get install acl    # instalarlo si falta
+sudo tune2fs -l /dev/vda2 | grep "Default mount options"</code></pre>
+    </section>
+
+    <section class="tarjeta">
+        <h3>Herramientas: setfacl y getfacl</h3>
+        <ul>
+            <li><code>setfacl</code>: asigna, modifica o elimina ACL.</li>
+            <li><code>getfacl</code>: muestra los permisos tradicionales y las ACL.</li>
+        </ul>
+        <p>Sintaxis para añadir o modificar una entrada:</p>
+        <pre><code>setfacl -m tipo:identificador:permisos fichero_o_directorio</code></pre>
+        <ul>
+            <li><strong>tipo:</strong> <code>u</code> (usuario), <code>g</code> (grupo), <code>o</code> (otros), <code>m</code> (máscara).</li>
+            <li><strong>identificador:</strong> nombre del usuario o grupo.</li>
+            <li><strong>permisos:</strong> <code>r</code>, <code>w</code>, <code>x</code> o combinaciones.</li>
+        </ul>
+<pre><code>setfacl -m u:ana:rw documento.txt        # usuario
+setfacl -m g:profesores:rwx directorio   # grupo
+getfacl documento.txt                    # consultar</code></pre>
+
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Opción</th><th>Descripción</th></tr>
+            <tr><td><code>-m</code></td><td>Añade o modifica una entrada.</td></tr>
+            <tr><td><code>-x</code></td><td>Elimina una entrada concreta (<code>setfacl -x u:jon fichero</code>).</td></tr>
+            <tr><td><code>-b</code></td><td>Borra todas las ACL y deja solo los permisos básicos UGO.</td></tr>
+            <tr><td><code>-R</code></td><td>Aplica los cambios de forma recursiva.</td></tr>
+            <tr><td><code>-d</code></td><td>Define la ACL predeterminada (solo en directorios).</td></tr>
+            <tr><td><code>-k</code></td><td>Borra los permisos por defecto.</td></tr>
+        </table>
+        </div>
+        <p>Es conveniente comprobar los permisos existentes con <code>getfacl</code> antes de ejecutar <code>setfacl</code>.</p>
+    </section>
+
+    <section class="tarjeta">
+        <h3>Tipos de entrada en una ACL</h3>
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Entrada</th><th>Formato</th></tr>
+            <tr><td>Propietario (owner)</td><td><code>user::rwx</code></td></tr>
+            <tr><td>Usuario nombrado</td><td><code>user:nombre:rwx</code></td></tr>
+            <tr><td>Grupo propietario</td><td><code>group::rwx</code></td></tr>
+            <tr><td>Grupo nombrado</td><td><code>group:nombre:rwx</code></td></tr>
+            <tr><td>Máscara (mask)</td><td><code>mask::rwx</code></td></tr>
+            <tr><td>Otros</td><td><code>other::rwx</code></td></tr>
+        </table>
+        </div>
+
+        <h3>La máscara (mask)</h3>
+        <p>
+            La máscara fija el <strong>máximo de permisos efectivos</strong> del grupo propietario
+            y de los usuarios y grupos nombrados. No limita al propietario ni a "otros".
+        </p>
+<pre><code>user:info01:rwx
+mask::rw-          → permisos efectivos de info01: rw-</code></pre>
+        <p>
+            Al añadir una entrada, <code>setfacl</code> suele recalcular la máscara automáticamente.
+            Puede fijarse a mano con <code>setfacl -m m:rw fichero</code>.
+        </p>
+    </section>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Ejemplo práctico 1</span>
+        <h3>Usuarios con permisos distintos sobre un fichero</h3>
+        <p>
+            El usuario crea <code>fichero.txt</code> y se quiere que: <code>info01</code> solo lea,
+            <code>info02</code> lea y escriba, <code>conta02</code> solo lea y <code>conta01</code>
+            no pueda hacer nada.
+        </p>
+<pre><code>touch fichero.txt
+chmod a-rwx fichero.txt                 # quitar permisos básicos
+setfacl -b fichero.txt                  # quitar ACL previas
+setfacl -m u:info01:r  fichero.txt
+setfacl -m u:info02:rw fichero.txt
+setfacl -m u:conta02:r fichero.txt
+getfacl fichero.txt</code></pre>
+<pre><code># file: fichero.txt
+# owner: usuario
+# group: usuario
+user::---
+user:info01:r--
+user:info02:rw-
+user:conta02:r--
+group::---
+mask::rw-
+other::---</code></pre>
+        <p>
+            <code>conta01</code> no necesita ninguna regla: al no coincidir con ninguna entrada
+            cae en "otros", que no tiene permisos.
+        </p>
+    </section>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Ejemplo práctico 2</span>
+        <h3>Efecto de la máscara</h3>
+<pre><code>touch documento.txt
+setfacl -m u:jon:rw documento.txt
+setfacl -m u:ana:r  documento.txt
+setfacl -m m:r      documento.txt
+getfacl documento.txt</code></pre>
+<pre><code>user::rw-
+user:jon:rw-       #effective:r--
+user:ana:r--
+group::r--
+mask::r--
+other::r--</code></pre>
+        <p>
+            Aunque a <code>jon</code> se le dio <code>rw</code>, la máscara solo permite <code>r</code>,
+            así que únicamente puede leer. Para eliminar su regla: <code>setfacl -x u:jon documento.txt</code>;
+            para borrar todas las ACL: <code>setfacl -b documento.txt</code>.
+        </p>
+    </section>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Ejemplo práctico 3</span>
+        <h3>ACL predeterminada en un directorio</h3>
+<pre><code>setfacl -d -m u::rw proiektu_dir/
+getfacl proiektu_dir/</code></pre>
+        <p>
+            Con <code>-d</code> se define una ACL <em>default</em>: no cambia los permisos del
+            directorio, sino los que <strong>heredarán los ficheros y subdirectorios nuevos</strong>
+            creados dentro. Solo se puede aplicar a directorios.
+        </p>
+    </section>
+
+    <h2 id="contrasenas">Políticas de contraseñas</h2>
+
+    <section class="tarjeta">
+        <h3>Autenticación: ¿cómo demuestro quién soy?</h3>
+        <p>Un usuario se autentica con un identificador y uno o más elementos de verificación:</p>
+        <div class="tabla-scroll">
+        <table>
+            <tr><th>Método</th><th>Ejemplo</th></tr>
+            <tr><td>Identificador y contraseña</td><td>Acceder a Moodle con usuario y clave.</td></tr>
+            <tr><td>Contraseña OTP (un solo uso)</td><td>Código temporal en el móvil para confirmar en la banca online.</td></tr>
+            <tr><td>Certificado PKI en tarjeta o token USB</td><td>Tarjeta criptográfica con certificado digital y PIN.</td></tr>
+            <tr><td>Biometría</td><td>Huella dactilar o reconocimiento facial.</td></tr>
+            <tr><td>Sin acto (RFID)</td><td>Tarjeta que abre una puerta al acercarla.</td></tr>
+        </table>
+        </div>
+        <p>
+            Todos responden a la misma pregunta y se resumen en tres tipos de factor:
+            algo que <strong>sabes</strong> (contraseña), algo que <strong>tienes</strong>
+            (tarjeta, token, móvil) o algo que <strong>eres</strong> (huella, cara).
+        </p>
+    </section>
+
+    <section class="tarjeta">
+        <h3>Requisitos de una política de contraseñas</h3>
+        <p>La contraseña debe ser <strong>compleja</strong> (robusta) y <strong>secreta</strong>. Una política adecuada establece:</p>
+        <ul>
+            <li><strong>Tamaño mínimo</strong> suficiente.</li>
+            <li><strong>Caducidad</strong>: obligar a cambiarla periódicamente.</li>
+            <li><strong>Número de intentos</strong> limitado antes de bloquear.</li>
+            <li><strong>Histórico</strong> que impida repetir contraseñas anteriores.</li>
+            <li><strong>Calidad y robustez</strong> comprobadas por el sistema.</li>
+            <li><strong>Formación</strong> de los usuarios sobre cómo protegerlas.</li>
+        </ul>
+        <p>Una contraseña buena cumple:</p>
+        <ul>
+            <li>Mezcla de mayúsculas, minúsculas, números y símbolos.</li>
+            <li>Al menos 8 caracteres; lo recomendable es 12 o más.</li>
+            <li>No es una fecha ni un nombre propio, ni tiene relación con el usuario.</li>
+            <li>No aparece en ningún diccionario.</li>
+        </ul>
+        <div class="aviso-caja">
+            <strong>Contraseñas débiles:</strong> palabras de diccionario, secuencias simples
+            (<code>123456</code>), pequeñas variaciones de palabras conocidas
+            (<code>Casa2026</code>, <code>perroverde</code>) o datos personales como cumpleaños y nombres.
+        </div>
+    </section>
+
+    <div class="grid">
+        <article class="tarjeta">
+            <span class="etiqueta">Ataque</span>
+            <h3>Fuerza bruta</h3>
+            <p>
+                Prueba todas las combinaciones posibles hasta dar con la correcta.
+                El número de claves es <em>(caracteres posibles)<sup>longitud</sup></em>,
+                así que crece muy deprisa al aumentar la longitud o los tipos de carácter.
+            </p>
+            <p>
+                <strong>Ejemplo:</strong> 5 letras minúsculas (27 símbolos) dan
+                27<sup>5</sup> = 14.348.907 combinaciones; con mayúsculas y minúsculas
+                (54 símbolos) serían 54<sup>5</sup> = 459.165.024.
+            </p>
+        </article>
+
+        <article class="tarjeta">
+            <span class="etiqueta">Ataque</span>
+            <h3>Diccionario</h3>
+            <p>
+                Prueba palabras de un diccionario, completado con contraseñas filtradas
+                en brechas anteriores. Es más eficaz que la fuerza bruta porque muchos
+                usuarios eligen claves fáciles de recordar.
+            </p>
+            <p>
+                <strong>Defensa:</strong> contraseñas complejas y limitar los intentos de acceso,
+                como el PIN de una SIM, que se bloquea y exige el PUK.
+            </p>
+        </article>
+    </div>
+
+    <section class="tarjeta">
+        <h3>¿Dónde se guardan las contraseñas?</h3>
+        <p>
+            <strong>GNU/Linux:</strong> en <code>/etc/shadow</code>, que no guarda la contraseña sino su
+            <strong>hash</strong> y datos de caducidad. Solo root puede leerlo. Al iniciar sesión, el sistema
+            calcula el hash de lo que escribimos y lo compara con el almacenado.
+            (<code>/etc/passwd</code>, legible por todos, solo contiene una "x" en el campo de contraseña.)
+        </p>
+        <p>
+            <strong>Windows:</strong> en la base de datos <strong>SAM</strong> (Security Account Manager),
+            protegida por el sistema. Las cuentas se consultan con herramientas como <code>net user</code>.
+        </p>
+
+        <h3>Caducidad y control de cuentas en Linux</h3>
+        <p>Los campos de <code>/etc/shadow</code> controlan la caducidad; algunos comandos útiles:</p>
+<pre><code>passwd usuario          # cambiar contraseña
+usermod -L usuario      # bloquear la cuenta (añade "!" en shadow)
+usermod -U usuario      # desbloquearla
+usermod -e 2027-06-30 usuario   # fecha de caducidad de la cuenta</code></pre>
+        <p>
+            El módulo PAM (<code>pam_cracklib</code> / <code>pam_pwquality</code>) comprueba la complejidad
+            de las contraseñas al crearlas o cambiarlas con <code>passwd</code>.
+        </p>
+    </section>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Auditoría</span>
+        <h3>John the Ripper</h3>
+        <p>
+            Herramienta que usan los administradores para <strong>auditar la fortaleza de las contraseñas</strong>
+            de sus propios sistemas. Genera el hash de cada candidato (por fuerza bruta o por diccionario) y
+            lo compara con el hash que se quiere romper: si coincide, ha encontrado la contraseña.
+        </p>
+        <p>
+            Requiere acceso a los hashes (por ejemplo <code>/etc/shadow</code>, protegido para usuarios normales).
+        </p>
+        <div class="aviso-caja">
+            Debe usarse únicamente en sistemas propios o con autorización expresa.
+        </div>
+    </section>
+
+    <section class="tarjeta">
+        <h3>SSO y autenticación multifactor (MFA)</h3>
+        <p>
+            Con <strong>Single Sign-On (SSO)</strong> el usuario se autentica una vez y accede a
+            varios servicios sin recordar una contraseña distinta para cada uno. Pero concentra el
+            riesgo: si alguien consigue esas credenciales, podría acceder a muchos servicios.
+        </p>
+        <p>
+            Por eso el SSO debe protegerse con <strong>MFA</strong>, que combina varios factores
+            (por ejemplo, contraseña y confirmación en el móvil) y refuerza el control de acceso.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    <p>Seguridad Informática · SAD · 2AS3A</p>
+</footer>
+
+</body>
+</html>
