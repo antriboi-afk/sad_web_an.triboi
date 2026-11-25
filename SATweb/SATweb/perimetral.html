@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguridad Perimetral | Seguridad Informática</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html">Inicio</a>
+    <a href="informacion.html">Información</a>
+    <a href="amenazas.html">Amenazas</a>
+    <a href="proteccion.html">Protección</a>
+    <a href="acceso.html">Acceso</a>
+    <a href="criptografia.html">Criptografía</a>
+    <a href="perimetral.html" class="activo">Perimetral</a>
+    <a href="noticias.html">Noticias</a>
+</nav>
+
+<header class="hero">
+    <h1>Seguridad perimetral</h1>
+    <p>Arquitectura y elementos de red para proteger el perímetro interno frente a redes externas no confiables.</p>
+</header>
+
+<main class="contenedor">
+
+    <section class="tarjeta">
+        <h2>¿Qué es la seguridad perimetral?</h2>
+        <p>
+            La <strong>seguridad perimetral</strong> se define como la arquitectura y el conjunto
+            de hardware y software utilizado para proteger el perímetro de una red interna frente a
+            otras redes en las que no se confía, generalmente Internet.
+        </p>
+        <p>
+            Su objetivo es controlar la frontera que separa la red corporativa del exterior,
+            vigilando las comunicaciones para evitar accesos no autorizados, fugas de datos desde el
+            interior y ataques externos, ofreciendo un único punto controlado de conexión.
+        </p>
+        <div class="indice">
+            <a class="boton" href="#firewall">Firewall (Cortafuegos)</a>
+            <a class="boton" href="#vpn">VPN</a>
+            <a class="boton" href="#dmz">DMZ</a>
+            <a class="boton" href="#proxy">Proxy</a>
+        </div>
+    </section>
+
+    <!-- 1. FIREWALL -->
+    <h2 id="firewall">1. Cortafuegos (Firewall)</h2>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Filtrado de tráfico</span>
+        <h3>Descripción</h3>
+        <p>
+            Un <strong>cortafuegos o firewall</strong> es un elemento de red (hardware o software) en el
+            que se define la política de accesos de la organización. Su función principal es filtrar el
+            tráfico que entra y sale de la red corporativa, permitiendo únicamente las comunicaciones
+            autorizadas y bloqueando el resto.
+        </p>
+        <div class="aviso-caja">
+            <strong>Alcance de protección:</strong> el cortafuegos actúa exclusivamente como defensa
+            perimetral; no puede detener ataques originados por usuarios que ya están dentro de la red
+            interna ni conexiones que no pasen a través de él.
+        </div>
+
+        <h3>Características y filosofías de configuración</h3>
+        <ul>
+            <li><strong>Política restrictiva (lista blanca):</strong> se deniega todo el tráfico por defecto excepto aquello que se acepta explícitamente. Es la opción recomendada en entornos profesionales.</li>
+            <li><strong>Política permisiva (lista negra):</strong> se acepta todo el tráfico por defecto excepto aquello que se deniega explícitamente.</li>
+            <li><strong>Control por zonas y reglas:</strong> filtra paquetes según dirección IP origen/destino, puerto y protocolo (TCP/UDP), además de aplicar <strong>NAT (Masquerading)</strong> para la salida a Internet.</li>
+            <li><strong>Complemento con IDS/IDPS:</strong> suele acompañarse de sistemas de detección y prevención de intrusos que monitorizan tráfico anómalo y bloquean ataques activos.</li>
+        </ul>
+    </section>
+
+    <!-- 2. VPN -->
+    <h2 id="vpn">2. Redes Privadas Virtuales (VPN)</h2>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Túnel + Cifrado</span>
+        <h3>Descripción</h3>
+        <p>
+            Una <strong>VPN (Virtual Private Network)</strong> es una tecnología que permite establecer
+            una conexión privada y segura —similar a una red local (LAN)— sobre una infraestructura de red
+            pública e insegura como Internet. Para ello crea un <strong>túnel virtual cifrado</strong>
+            (encapsulación o tunelización) entre un cliente VPN y un servidor VPN, permitiendo transportar
+            datos privados ajenos al resto del tráfico.
+        </p>
+
+        <h3>Características y propiedades de seguridad</h3>
+        <ul>
+            <li><strong>Confidencialidad:</strong> los paquetes viajan cifrados (por ejemplo mediante AES) para que terceros o el propio ISP no puedan leer la información.</li>
+            <li><strong>Integridad y autenticidad:</strong> verifica la identidad de los extremos (certificados, credenciales o tokens) y emplea funciones hash y firma digital para garantizar que los datos no se alteran (no repudio).</li>
+            <li><strong>Privacidad de IP:</strong> hacia el exterior se expone la dirección IP pública del servidor VPN en lugar de la del cliente.</li>
+            <li><strong>Ventajas frente a líneas dedicadas:</strong> menor coste al aprovechar Internet, alta movilidad y facilidad para escalar nuevos túneles (aunque el rendimiento y la latencia dependen del ISP).</li>
+        </ul>
+
+        <h3>Tipos de conexión VPN</h3>
+        <div class="grid">
+            <article class="tarjeta">
+                <span class="etiqueta">Cliente - Servidor</span>
+                <h3>Acceso remoto (VPDN)</h3>
+                <p>
+                    Conecta a trabajadores móviles o teletrabajadores con la red interna de la empresa
+                    mediante un software cliente instalado en su equipo. Requiere autenticación previa
+                    para recibir las rutas internas.
+                </p>
+            </article>
+            <article class="tarjeta">
+                <span class="etiqueta">Pasarela - Pasarela</span>
+                <h3>Site-to-Site (LAN a LAN)</h3>
+                <p>
+                    Une dos o más redes locales de distintas sucursales u oficinas a través de Internet,
+                    formando una intranet extendida de forma transparente para los usuarios sin configurar
+                    cada equipo.
+                </p>
+            </article>
+        </div>
+
+        <h3>Principales protocolos VPN según el modelo OSI</h3>
+        <div class="tabla-scroll">
+            <table>
+                <tr>
+                    <th>Protocolo</th>
+                    <th>Capa OSI</th>
+                    <th>Características técnicas</th>
+                </tr>
+                <tr>
+                    <td><strong>PPTP / L2TP</strong></td>
+                    <td>Capa 2 (Enlace)</td>
+                    <td>PPTP está obsoleto por ser inseguro. L2TP crea el túnel sin cifrar, por lo que se combina con IPsec (<code>L2TP/IPsec</code>).</td>
+                </tr>
+                <tr>
+                    <td><strong>IPsec</strong></td>
+                    <td>Capa 3 (Red)</td>
+                    <td>Estándar corporativo (negociación IKE por UDP 500/4500). Usa <strong>AH</strong> (autenticación/integridad) y <strong>ESP</strong> (cifrado). Opera en <em>modo transporte</em> (host a host, cifra solo datos) o <em>modo túnel</em> (red a red, cifra todo el paquete IP original).</td>
+                </tr>
+                <tr>
+                    <td><strong>WireGuard</strong></td>
+                    <td>Capa 3 (Red)</td>
+                    <td>Protocolo moderno de código muy reducido, alto rendimiento y criptografía actual (UDP 51820).</td>
+                </tr>
+                <tr>
+                    <td><strong>OpenVPN / SSTP</strong></td>
+                    <td>Capas 4–6</td>
+                    <td>Basados en <strong>SSL/TLS</strong>. Muy flexibles y capaces de atravesar cortafuegos restrictivos (puerto TCP 443 en SSTP o UDP/TCP 1194 en OpenVPN).</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+
+    <!-- 3. DMZ -->
+    <h2 id="dmz">3. Zona Desmilitarizada (DMZ)</h2>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Segmentación de red</span>
+        <h3>Descripción</h3>
+        <p>
+            La <strong>DMZ (Zona Desmilitarizada)</strong> es una subred intermedia situada entre la red
+            interna (confiable, LAN) y la red externa (no confiable, Internet). En ella se alojan
+            exclusivamente los servidores que deben ofrecer servicios públicos hacia el exterior —como
+            el servidor web, correo electrónico, DNS o FTP— aislándolos de la red privada donde residen
+            los equipos de usuarios y las bases de datos críticas.
+        </p>
+
+        <h3>Características principales</h3>
+        <ul>
+            <li><strong>Contención de brechas:</strong> si un atacante compromete un servidor público ubicado en la DMZ, queda aislado y no puede acceder directamente a la red interna.</li>
+            <li><strong>Control estricto del tráfico:</strong> se permite el acceso desde Internet únicamente a los puertos públicos de la DMZ (por ejemplo, TCP 80/443 para web o TCP 25/587 para correo) y se prohíben las conexiones iniciadas desde la DMZ hacia la LAN.</li>
+            <li><strong>Router frontera:</strong> conecta la organización con el proveedor de Internet, enruta el tráfico mediante protocolos como BGP y aplica listas de control de acceso (ACL) iniciales.</li>
+        </ul>
+
+        <h3>Arquitecturas de DMZ</h3>
+        <div class="tabla-scroll">
+            <table>
+                <tr>
+                    <th>Arquitectura</th>
+                    <th>Estructura</th>
+                    <th>Nivel de seguridad</th>
+                </tr>
+                <tr>
+                    <td><strong>Sin seguridad perimetral</strong></td>
+                    <td>Red plana sin segmentar donde los servidores públicos y los internos comparten la misma subred.</td>
+                    <td><strong>Nulo:</strong> cualquier acceso externo expone directamente toda la intranet.</td>
+                </tr>
+                <tr>
+                    <td><strong>DMZ débil (un cortafuegos)</strong></td>
+                    <td>Un único cortafuegos con <strong>3 interfaces</strong> separa WAN, DMZ y LAN.</td>
+                    <td><strong>Medio:</strong> protege la red interna, pero un fallo o mala configuración en ese único firewall compromete ambas zonas.</td>
+                </tr>
+                <tr>
+                    <td><strong>DMZ fuerte (doble cortafuegos)</strong></td>
+                    <td>La DMZ se sitúa entre dos cortafuegos: uno <em>perimetral</em> (Internet–DMZ) y otro <em>interno</em> (DMZ–LAN), preferiblemente de distintos fabricantes.</td>
+                    <td><strong>Alto:</strong> un fallo en el cortafuegos externo solo afecta a la DMZ; el interno mantiene protegida la red corporativa.</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+
+    <!-- 4. PROXY -->
+    <h2 id="proxy">4. Servidor Proxy</h2>
+
+    <section class="tarjeta">
+        <span class="etiqueta">Intermediario de capa de aplicación</span>
+        <h3>Descripción</h3>
+        <p>
+            Un <strong>servidor proxy</strong> es un equipo o software que actúa como intermediario
+            en las peticiones de red entre los clientes y los servidores de destino (operando habitualmente
+            en la capa 7 del modelo OSI, como HTTP/HTTPS). En lugar de que el usuario se conecte
+            directamente a Internet, envía su petición al proxy y este la tramita en su nombre.
+        </p>
+
+        <h3>Características y modalidades</h3>
+        <ul>
+            <li><strong>Control y filtrado de contenidos:</strong> permite aplicar políticas de acceso web bloqueando dominios maliciosos, descargas peligrosas o páginas no autorizadas en la empresa.</li>
+            <li><strong>Ocultación de identidad (NAT a nivel de aplicación):</strong> los servidores externos solo ven la dirección IP del proxy, ocultando la topología y las direcciones privadas de los equipos internos.</li>
+            <li><strong>Caché y ahorro de ancho de banda:</strong> almacena temporalmente recursos web solicitados con frecuencia para servirlos localmente con menor latencia.</li>
+            <li><strong>Registro y auditoría (logs):</strong> centraliza el historial de peticiones salientes para detectar usos indebidos o infecciones de malware.</li>
+            <li><strong>Proxy directo vs. Proxy inverso:</strong> el <em>proxy directo (forward)</em> protege y controla a los clientes internos que salen a Internet; el <em>proxy inverso (reverse)</em> se sitúa delante de los servidores web (habitualmente en la DMZ) para repartir carga, gestionar certificados TLS y protegerlos frente a ataques externos.</li>
+        </ul>
+    </section>
+
+</main>
+
+<footer>
+    <p>Seguridad Informática · SAD · 2AS3A</p>
+</footer>
+
+</body>
+</html>
